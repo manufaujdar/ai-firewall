@@ -27,8 +27,9 @@ def review() -> list[Check]:
         Check("clarity", "unsupported formats are named", "Files, images, audio" in CONSOLE_HTML),
         Check("interaction", "primary action follows payload input", CONSOLE_HTML.index('id="payload"') < CONSOLE_HTML.index('id="scan"')),
         Check("interaction", "advanced settings are collapsible", "<details>" in CONSOLE_HTML),
-        Check("privacy", "API key is not stored", "localStorage.setItem('key'" not in CONSOLE_JS and "sessionStorage" not in CONSOLE_JS),
-        Check("privacy", "history is explicitly local", "Local history" in CONSOLE_HTML and "localStorage" in CONSOLE_JS),
+        Check("privacy", "browser storage is not used", "localStorage" not in CONSOLE_JS and "sessionStorage" not in CONSOLE_JS),
+        Check("privacy", "history is metadata-only", "Local metadata history" in CONSOLE_HTML and "/v1/privacy/history" in CONSOLE_JS),
+        Check("privacy", "runtime input has no sample payload", '<textarea id="payload"' in CONSOLE_HTML and '</textarea>' in CONSOLE_HTML and 'synthetic.user' not in CONSOLE_HTML),
         Check("security", "dynamic history uses textContent", "title.textContent" in CONSOLE_JS and "innerHTML" not in CONSOLE_JS),
         Check("maintainability", "CSS and JS use separate asset routes", "/assets/console.css" in CONSOLE_HTML and "/assets/console.js" in CONSOLE_HTML),
     ]

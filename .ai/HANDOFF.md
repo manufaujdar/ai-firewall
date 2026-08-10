@@ -1,12 +1,17 @@
 # Current handoff
 
-No active implementation handoff. The 0.1.1 candidate adds an accessible local scan-review
-workspace, memory-only API key handling, optional browser-local synthetic history, report/brief
-exports, restrictive browser headers, Apache-2.0 project metadata, governance and validation
-templates, Dependabot/PR safeguards, and a deterministic frontend review.
+Completed locally: first privacy vertical slice. Every scan uses the local orchestrator; source
+content is request-memory only; events, audit, and SQLite are metadata-only; the browser has no
+payload persistence or prefilled runtime sample. Authenticated APIs expose the actual topology,
+ordered SSE events, and erasable local history. Optional model configuration requires relative,
+SHA-256-pinned local artifacts and validated spans, with one bounded input budget and one total
+deadline per model. Model or persistence failures block and suppress the payload. Forwarding remains
+disabled by default, and no model executor, weights, download path, external service, or dependency
+was added.
 
-Validation passed 121 tests, Python compilation, Ruff, JavaScript syntax, 14/14 frontend source
-checks, whitespace/diff checks, documentation links, citation parsing, and a synthetic fixture scan.
-Browser automation was unavailable, so manual desktop/mobile, keyboard, and screen-reader review
-remains. Forwarding is still disabled. No commit, push, PR, tag, release, dependency upgrade, or
-proxy enablement was performed. See `docs/release-readiness.md`.
+Validation: 142 tests pass; Ruff, compile, frontend source audit, JavaScript syntax, dependency,
+Compose configuration, live Uvicorn HTTP, Markdown/CITATION, diff, no-network model, and synthetic secret-fixture
+checks pass. A real container boot was unavailable because Docker was not running. The implementation
+has been validated for the requested commit and push. Remaining enterprise work is tracked in
+`docs/privacy-enhancement-plan.md`; device-wide egress enforcement and regulated-production
+assurance are not claimed.

@@ -54,7 +54,7 @@ class RequestBodyLimitMiddleware:
             await _error_response(400, "Content-Length mismatch")(scope, receive, send)
             return
 
-        replay = _replay_body(bytes(body))
+        replay = _replay_body(bytes(body), receive)
         await self.app(scope, replay, send)
 
 
@@ -80,7 +80,7 @@ def _content_length(scope: Scope) -> int | None:
     return values[0]
 
 
-def _replay_body(body: bytes) -> Receive:
+def _replay_body(body: bytes, upstream_receive: Receive) -> Receive:
     delivered = False
 
     async def receive() -> Message:
@@ -88,7 +88,7 @@ def _replay_body(body: bytes) -> Receive:
         if not delivered:
             delivered = True
             return {"type": "http.request", "body": body, "more_body": False}
-        return {"type": "http.disconnect"}
+        return await upstream_receive()
 
     return receive
 

@@ -17,6 +17,13 @@ local policy and returns an `allow`, `redact`, or `block` decision with metadata
 - Deterministic redaction without generative rewriting
 - Authenticated scan and policy-summary APIs
 - Metadata-only JSONL audit events without raw prompts, matches, or authorization headers
+- Real-time local privacy graph with ordered metadata-only SSE events
+- Restrictive local SQLite history containing decision metadata only; raw and sanitized payloads are
+  never written by the backend
+- Authenticated runtime topology for active agents, actions, model registry, graph edges, bounded
+  loops, events, and storage mode
+- Pinned offline local-model contracts with strict structured spans and fail-closed health; no model
+  or runtime download is enabled by default
 - HTTPS destination and caller-header validation contracts, while forwarding remains disabled
 - Accessible local scan-review workspace with optional local-only history, report export, and a
   copyable qualified Markdown review brief
@@ -37,9 +44,10 @@ Set `AI_FIREWALL_API_KEY` in `.env` to a synthetic local key of at least 32 char
 uvicorn ai_firewall.main:app --reload --host 127.0.0.1 --port 8080
 ```
 
-Open `http://127.0.0.1:8080/` for the local review workspace. Use synthetic content only. The key
-is held in page memory and is never saved to browser storage. Optional scan history stays in the
-browser on that device and can be cleared from advanced settings.
+Open `http://127.0.0.1:8080/` for the local review workspace. The key and payload stay in page
+memory and browser storage is not used. History comes from the backend's local metadata-only SQLite
+database and can be cleared from advanced settings. The runtime input starts empty; no sample or
+mock payload is shipped in the interface.
 
 Check process liveness and dependency-aware readiness:
 
@@ -57,6 +65,10 @@ curl -s http://127.0.0.1:8080/v1/scan \
   -d '{"payload":{"prompt":"Contact synthetic.user@example.com"}}'
 ```
 
+For real-time graph events, use `POST /v1/privacy/inspect/stream`. Authenticated operators can read
+`GET /v1/privacy/topology` and metadata-only `GET /v1/privacy/history`; `DELETE` on the history route
+removes local summaries.
+
 `/health` exposes liveness only. `/ready` returns one generic unavailable response unless local
 authentication is configured and the audit sink is usable. Interactive API documentation is
 disabled.
@@ -66,12 +78,14 @@ disabled.
 ```mermaid
 flowchart LR
     A["Local caller"] --> B["Authentication + body limit"]
-    B --> C["Bounded JSON inspection"]
-    C --> D{"Strictest policy action"}
+    B --> C["Deterministic detector agent"]
+    C --> M["Pinned local-model gate"]
+    M --> R["Residual serialized-output scan"]
+    R --> D{"Strictest policy action"}
     D -->|block| E["Payload suppressed"]
     D -->|redact| F["Deterministic placeholders"]
     D -->|allow| G["Inspected payload"]
-    C --> H["Metadata-only audit"]
+    D --> H["Metadata-only audit + SQLite"]
     F -. "forwarding disabled" .-> I["Future provider adapter"]
     G -. "forwarding disabled" .-> I
 ```
@@ -101,6 +115,7 @@ assistive-technology, and security review are still required.
 - [Security boundary](docs/security.md)
 - [Known limitations](docs/limitations.md)
 - [Validation protocol](docs/validation-protocol.md)
+- [Privacy enhancement plan](docs/privacy-enhancement-plan.md)
 - [0.1.1 candidate readiness](docs/release-readiness.md)
 - [Compliance boundary](docs/compliance.md)
 - [Provenance](docs/provenance.md)

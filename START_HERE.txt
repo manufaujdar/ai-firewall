@@ -13,6 +13,7 @@ READ FIRST
 4. config/policy.yaml        Current inspection and destination policy
 5. docs/limitations.md       Supported inputs and explicit research boundary
 6. GOVERNANCE.md             Maintainer decisions and release gates
+7. docs/privacy-enhancement-plan.md  Agents, models, graph, events, storage, and roadmap
 
 HUMAN WORK
 ----------
@@ -24,9 +25,9 @@ and tests are under tests/; humans do not need to open them for ordinary review.
 Never put real secrets, patient information, payment data, or private prompts in
 this project. The framework is a foundation, not a complete production firewall.
 
-The local browser workspace may keep optional synthetic result history. Clear it
-from advanced settings after review. Exported reports are operator artifacts and
-must be inspected before sharing; server audit files remain metadata-only.
+The browser does not persist payloads or keys. Local history and exports are
+metadata-only. Raw request content is processed ephemerally; server audit and
+SQLite records must never include payloads, matches, or authorization values.
 
 AI-agent instructions and memory are in AGENTS.md and .ai/.
 

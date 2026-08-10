@@ -6,7 +6,8 @@ applicable action. It is not a transparent device-wide interceptor.
 
 ## Components
 
-- `main.py`: API boundary, health/readiness, disabled proxy orchestration, and local UI assets
+- `main.py`: API boundary, health/readiness, real-time SSE/topology/history routes, disabled proxy
+  orchestration, and local UI assets
 - `scanner.py`: bounded recursive inspection and deterministic sanitization; applies the policy
   default only to unmatched input and blocks detector failures
 - `policy.py`: strict versioned YAML policy loading and validation
@@ -15,7 +16,14 @@ applicable action. It is not a transparent device-wide interceptor.
 - `request_limits.py`: body-size enforcement before JSON parsing
 - `proxy/`: HTTPS destination and caller-header validation contracts
 - `web_ui.py`: dependency-free local review workspace; API keys stay in memory and optional history
-  is stored only in the local browser
+  is metadata-only from the local backend database; browser storage is not used
+- `privacy/orchestrator.py`: explicit local agent graph, strictest decision, residual scan, events,
+  and fail-closed persistence
+- `privacy/events.py`: ordered metadata-key-allowlisted real-time events
+- `privacy/database.py`: restrictive local SQLite metadata store; no payload columns
+- `privacy/models.py`: offline pinned model manifest, artifact health, deadlines, and structured span
+  validation
+- `config/models.yaml`: empty-by-default local model registry; no runtime downloads
 - `scripts/review_frontend.py`: deterministic network-free source review of frontend quality signals
 - `config/policy.yaml`: current rules and approved provider-host metadata
 
@@ -26,8 +34,9 @@ authenticated policy summary never exposes executable regular expressions.
 ## Current data flow
 
 Trusted local Host -> body-size gate -> API-key authentication -> strict request model -> bounded
-JSON traversal -> deterministic rules and validators -> strictest action -> payload suppression or
-redaction -> metadata-only audit.
+JSON traversal -> deterministic rules and validators -> optional pinned local-model gate ->
+deterministic redaction -> residual serialized-output scan -> strictest action -> metadata-only
+audit and SQLite. Each phase can emit a metadata-only event before the final local response.
 
 Destination and header modules define fail-closed contracts, but transport is intentionally
 configuration-disabled. Validated DNS evidence is not yet pinned to the eventual connection, local

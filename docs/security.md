@@ -8,8 +8,8 @@
   through context, encoding, fragmentation, normalization, or unsupported media.
 - Protect policies and binaries from local tampering if this becomes an endpoint control.
 - Obtain legal and employee-consent review before inspecting traffic or considering TLS interception.
-- Treat browser-local history and exported reports as operator artifacts that may contain sanitized
-  content. Clear or protect them according to local policy.
+- Browser storage is not used. Exports and copied briefs contain metadata only; the structured scan
+  response is transient in page memory.
 
 ## Current enforced boundaries
 
@@ -19,6 +19,13 @@
   audit sink cannot be opened. It exposes no key or filesystem details.
 - Request bodies are bounded before JSON parsing; malformed or conflicting content lengths reject.
 - JSON traversal bounds depth and node count and rejects unsupported, cyclic, or non-finite values.
+- Every scan route uses the local privacy orchestrator. Redacted JSON is serialized and rescanned;
+  residual findings or serialization errors block.
+- Real-time events accept only allowlisted metadata keys. The SQLite schema has no payload, prompt,
+  match, header, or sanitized-content column and retains at most 1,000 local summaries.
+- The local model manifest is empty by default. Configured models require local relative artifacts,
+  SHA-256 pins, structured non-overlapping spans, entity allowlists, confidence thresholds, and
+  deadlines. Artifact, runtime, inference, or span failures block.
 - Interactive API documentation is disabled and local Host headers are allowlisted.
 - Browser responses deny framing, MIME sniffing, referrer disclosure, sensitive device APIs, and
   content loads outside the local origin through restrictive response headers.
@@ -29,8 +36,9 @@
 
 Connection pinning to the validated DNS answer, provider-specific credential injection, final-byte
 rescan, and response bounds are not implemented. Forwarding is therefore unavailable. Files, media,
-encoded or fragmented secrets, Unicode confusables, streaming data, and semantic personal-data
-detection remain unsupported. A redacted decision is not proof that no sensitive information remains.
+encoded or fragmented secrets, Unicode confusables, streaming provider protocols, and semantic
+personal-data detection remain unsupported. SSE reports graph progress only; it does not make
+provider streaming safe. A redacted decision is not proof that no sensitive information remains.
 
 ## Supply-chain limitations
 

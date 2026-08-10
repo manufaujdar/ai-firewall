@@ -11,6 +11,9 @@ controls force traffic through an approved path.
 - Deterministic configured regular expressions and a Luhn validator
 - Bounded request size, object depth, and node count
 - Metadata-only audit events
+- Metadata-only local SQLite summaries and real-time graph events
+- Residual serialized-output scan after deterministic redaction
+- Offline model artifact/digest/span contracts with an empty default registry
 - Local API-key authentication and trusted Host enforcement
 
 ## Unsupported or incomplete
@@ -18,7 +21,7 @@ controls force traffic through an approved path.
 - File uploads, documents, archives, images, OCR, audio, video, and clipboard monitoring
 - Encoded, fragmented, encrypted, obfuscated, or visually confusable secrets
 - Streaming request or response inspection
-- Local NER or sensitivity models
+- A validated local NER or sensitivity model and sandboxed runtime (framework only; none enabled)
 - Provider credential injection and DNS connection pinning
 - Signed policy distribution, tamper resistance, enterprise identity, and centralized administration
 - Browser-extension, system-proxy, VPN, EDR, or OS network-extension enforcement

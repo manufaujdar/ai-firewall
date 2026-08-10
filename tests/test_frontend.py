@@ -35,7 +35,13 @@ def test_console_has_accessible_local_research_boundaries() -> None:
 
 
 def test_console_does_not_persist_api_key_or_render_dynamic_html() -> None:
-    assert "localStorage.setItem('key'" not in CONSOLE_JS
+    assert "localStorage" not in CONSOLE_JS
     assert "sessionStorage" not in CONSOLE_JS
     assert "innerHTML" not in CONSOLE_JS
     assert "textContent" in CONSOLE_JS
+
+
+def test_console_has_no_runtime_sample_and_uses_metadata_history() -> None:
+    assert "synthetic.user" not in CONSOLE_HTML
+    assert "/v1/privacy/history" in CONSOLE_JS
+    assert "metadataExport" in CONSOLE_JS

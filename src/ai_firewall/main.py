@@ -1,16 +1,26 @@
+import asyncio
+import json
 from contextlib import asynccontextmanager
 from typing import Any
 
 import httpx
-from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
-from fastapi.responses import HTMLResponse
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response, status
+from fastapi.responses import HTMLResponse, StreamingResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from .audit import audit_storage_usable, write_audit_event
+from .audit import audit_storage_usable
 from .auth import APIKeyAuthenticator, authentication_ready
 from .config import settings
 from .models import Action, PolicySummary, ProxyRequest, RuleSummary, ScanRequest, ScanResponse
 from .policy import Policy, load_policy
+from .privacy import (
+    InspectionOutcome,
+    LocalModelRegistry,
+    PrivacyDatabase,
+    PrivacyOrchestrator,
+    load_model_manifest,
+)
+from .privacy.events import PrivacyEvent
 from .proxy import (
     DestinationValidationError,
     HeaderValidationError,
@@ -18,13 +28,21 @@ from .proxy import (
     validate_destination,
 )
 from .request_limits import RequestBodyLimitMiddleware
-from .scanner import scan_payload
 from .web_ui import CONSOLE_CSS, CONSOLE_HTML, CONSOLE_JS
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.policy = load_policy(settings.policy_path)
+    app.state.model_registry = LocalModelRegistry(load_model_manifest(settings.models_path))
+    app.state.privacy_database = PrivacyDatabase(settings.database_path)
+    app.state.privacy_database.initialize()
+    app.state.orchestrator = PrivacyOrchestrator(
+        policy=app.state.policy,
+        audit_path=settings.audit_path,
+        database=app.state.privacy_database,
+        models=app.state.model_registry,
+    )
     async with httpx.AsyncClient(
         timeout=settings.request_timeout_seconds,
         follow_redirects=False,
@@ -88,8 +106,13 @@ async def health() -> dict[str, Any]:
 
 
 @app.get("/ready")
-async def ready() -> dict[str, Any]:
-    if not authentication_ready(settings) or not audit_storage_usable(settings.audit_path):
+async def ready(request: Request) -> dict[str, Any]:
+    dependencies_ready = (
+        audit_storage_usable(settings.audit_path)
+        and request.app.state.privacy_database.usable()
+        and request.app.state.model_registry.ready()
+    )
+    if not authentication_ready(settings) or not dependencies_ready:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Service unavailable",
@@ -124,9 +147,98 @@ async def policy_summary(request: Request) -> PolicySummary:
 
 @app.post("/v1/scan", response_model=ScanResponse, dependencies=[Depends(authenticate)])
 async def scan(body: ScanRequest, request: Request) -> ScanResponse:
-    result = scan_payload(body.payload, _policy(request))
-    write_audit_event(settings.audit_path, result)
-    return result
+    outcome = await request.app.state.orchestrator.inspect(body.payload)
+    return outcome.response
+
+
+@app.post(
+    "/v1/privacy/inspect/stream",
+    dependencies=[Depends(authenticate)],
+)
+async def inspect_stream(body: ScanRequest, request: Request) -> StreamingResponse:
+    """Stream metadata-only graph events, then the local scan response."""
+
+    async def stream():
+        queue: asyncio.Queue[Any] = asyncio.Queue(maxsize=32)
+        sentinel = object()
+
+        async def run_graph() -> None:
+            try:
+                outcome = await request.app.state.orchestrator.inspect(body.payload, queue.put)
+                await queue.put(outcome)
+            finally:
+                await queue.put(sentinel)
+
+        task = asyncio.create_task(run_graph())
+        try:
+            while True:
+                item = await queue.get()
+                if item is sentinel:
+                    break
+                if isinstance(item, PrivacyEvent):
+                    yield f"event: privacy\ndata: {item.model_dump_json()}\n\n"
+                elif isinstance(item, InspectionOutcome):
+                    result = {
+                        "request_id": item.request_id,
+                        "result": item.response.model_dump(mode="json"),
+                    }
+                    yield f"event: result\ndata: {json.dumps(result, separators=(',', ':'))}\n\n"
+                else:
+                    raise TypeError("privacy stream received an invalid item")
+            await task
+        finally:
+            if not task.done():
+                task.cancel()
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get(
+    "/v1/privacy/topology",
+    dependencies=[Depends(authenticate)],
+)
+async def privacy_topology(request: Request) -> dict[str, Any]:
+    return request.app.state.orchestrator.topology()
+
+
+@app.get(
+    "/v1/privacy/history",
+    dependencies=[Depends(authenticate)],
+)
+async def privacy_history(
+    request: Request,
+    limit: int = Query(default=20, ge=1, le=100),
+) -> dict[str, Any]:
+    summaries = await asyncio.to_thread(request.app.state.privacy_database.recent, limit)
+    return {
+        "storage": "local_metadata_only",
+        "items": [
+            {
+                "request_id": summary.request_id,
+                "timestamp": summary.timestamp,
+                "decision": summary.decision.value,
+                "finding_count": summary.finding_count,
+                "rule_ids": summary.rule_ids,
+                "model_ids": summary.model_ids,
+                "duration_ms": summary.duration_ms,
+                "policy_version": summary.policy_version,
+            }
+            for summary in summaries
+        ],
+    }
+
+
+@app.delete(
+    "/v1/privacy/history",
+    dependencies=[Depends(authenticate)],
+)
+async def clear_privacy_history(request: Request) -> dict[str, Any]:
+    deleted = await asyncio.to_thread(request.app.state.privacy_database.clear)
+    return {"storage": "local_metadata_only", "deleted": deleted}
 
 
 @app.post("/v1/proxy", dependencies=[Depends(authenticate)])
@@ -148,8 +260,8 @@ async def proxy(body: ProxyRequest, request: Request) -> Response:
     except (DestinationValidationError, HeaderValidationError):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Destination not allowed")
 
-    result = scan_payload(body.payload, policy)
-    write_audit_event(settings.audit_path, result, destination.hostname)
+    outcome = await request.app.state.orchestrator.inspect(body.payload)
+    result = outcome.response
     if result.decision == Action.BLOCK:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
