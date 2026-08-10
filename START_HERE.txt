@@ -1,0 +1,31 @@
+AI FIREWALL — HUMAN START PAGE
+==============================
+
+Purpose: a local gateway that checks information before applications send it to
+cloud AI or language-model services.
+
+READ FIRST
+----------
+
+1. README.md                 Overview, setup, and request flow
+2. docs/security.md          Threats, privacy boundaries, and limitations
+3. docs/architecture.md      Components and extension points
+4. config/policy.yaml        Current inspection and destination policy
+
+HUMAN WORK
+----------
+
+Use docs/ for readable design and security decisions. Use config/policy.yaml only
+when intentionally changing machine-enforced policy. Source code is under src/
+and tests are under tests/; humans do not need to open them for ordinary review.
+
+Never put real secrets, patient information, payment data, or private prompts in
+this project. The framework is a foundation, not a complete production firewall.
+
+AI-agent instructions and memory are in AGENTS.md and .ai/.
+
+STARTUP TEAM
+------------
+
+For idea-to-release work, ask the agent to use the roster and explicit gears in
+.ai/TEAM.md. Security policy, validation, and human approval gates still apply.
