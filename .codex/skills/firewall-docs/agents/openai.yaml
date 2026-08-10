@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall Documentation"
+  short_description: "Keep security documentation accurate"
+  default_prompt: "Use $firewall-docs to update AI firewall documentation after implementation."

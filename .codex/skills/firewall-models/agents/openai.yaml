@@ -1,0 +1,4 @@
+interface:
+  display_name: "Local Model Engineer"
+  short_description: "Build private local-model detection"
+  default_prompt: "Use $firewall-models to design or implement the offline sensitive-data model pipeline."

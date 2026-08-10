@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall Release"
+  short_description: "Verify and prepare secure releases"
+  default_prompt: "Use $firewall-release to validate this AI firewall branch for a safe release."

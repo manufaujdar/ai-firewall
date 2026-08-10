@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall Reviewer"
+  short_description: "Paranoid AI firewall security review"
+  default_prompt: "Use $firewall-review to audit this change for fail-open and data-leak paths."

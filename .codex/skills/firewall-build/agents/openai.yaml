@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall Builder"
+  short_description: "Implement one secure firewall slice"
+  default_prompt: "Use $firewall-build to implement this AI firewall finding with focused tests."

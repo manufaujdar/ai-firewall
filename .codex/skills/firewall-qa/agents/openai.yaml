@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall QA"
+  short_description: "Adversarial privacy and bypass testing"
+  default_prompt: "Use $firewall-qa to test this AI firewall change with synthetic adversarial cases."

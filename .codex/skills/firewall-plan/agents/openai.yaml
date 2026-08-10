@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firewall Planner"
+  short_description: "Pressure-test AI firewall security plans"
+  default_prompt: "Use $firewall-plan to turn this AI firewall goal into a scoped, fail-closed implementation plan."
