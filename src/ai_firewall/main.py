@@ -19,7 +19,7 @@ from .proxy import (
 )
 from .request_limits import RequestBodyLimitMiddleware
 from .scanner import scan_payload
-from .web_ui import CONSOLE_HTML
+from .web_ui import CONSOLE_CSS, CONSOLE_HTML, CONSOLE_JS
 
 
 @asynccontextmanager
@@ -36,7 +36,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="AI Firewall",
-    version="0.1.0",
+    version="0.1.1",
     lifespan=lifespan,
     docs_url=None,
     redoc_url=None,
@@ -47,6 +47,22 @@ app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.trusted_ho
 authenticate = APIKeyAuthenticator(settings)
 
 
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; "
+        "object-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'"
+    )
+    response.headers["Permissions-Policy"] = (
+        "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    )
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
+
+
 def _policy(request: Request) -> Policy:
     return request.app.state.policy
 
@@ -54,6 +70,16 @@ def _policy(request: Request) -> Policy:
 @app.get("/", response_class=HTMLResponse, include_in_schema=False)
 async def local_console() -> str:
     return CONSOLE_HTML
+
+
+@app.get("/assets/console.css", include_in_schema=False)
+async def console_css() -> Response:
+    return Response(CONSOLE_CSS, media_type="text/css")
+
+
+@app.get("/assets/console.js", include_in_schema=False)
+async def console_js() -> Response:
+    return Response(CONSOLE_JS, media_type="text/javascript")
 
 
 @app.get("/health")

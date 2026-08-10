@@ -1,9 +1,12 @@
 # Current handoff
 
-No active implementation handoff. The bounded scan/policy alpha now enforces
-`default_action` for unmatched and empty payloads, converts detector exceptions to
-metadata-only fail-closed findings, and separates liveness from dependency-aware
-readiness. Forwarding remains disabled. A local synthetic scan/policy console now
-exercises the authenticated API without storing its key. The full suite passed 117
-tests and current Ruff. Human release review still owns the license, dependency hash
-locking and Docker digest policy; this is not a production proxy or SSRF boundary.
+No active implementation handoff. The 0.1.1 candidate adds an accessible local scan-review
+workspace, memory-only API key handling, optional browser-local synthetic history, report/brief
+exports, restrictive browser headers, Apache-2.0 project metadata, governance and validation
+templates, Dependabot/PR safeguards, and a deterministic frontend review.
+
+Validation passed 121 tests, Python compilation, Ruff, JavaScript syntax, 14/14 frontend source
+checks, whitespace/diff checks, documentation links, citation parsing, and a synthetic fixture scan.
+Browser automation was unavailable, so manual desktop/mobile, keyboard, and screen-reader review
+remains. Forwarding is still disabled. No commit, push, PR, tag, release, dependency upgrade, or
+proxy enablement was performed. See `docs/release-readiness.md`.

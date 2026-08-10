@@ -11,6 +11,8 @@ READ FIRST
 2. docs/security.md          Threats, privacy boundaries, and limitations
 3. docs/architecture.md      Components and extension points
 4. config/policy.yaml        Current inspection and destination policy
+5. docs/limitations.md       Supported inputs and explicit research boundary
+6. GOVERNANCE.md             Maintainer decisions and release gates
 
 HUMAN WORK
 ----------
@@ -21,6 +23,10 @@ and tests are under tests/; humans do not need to open them for ordinary review.
 
 Never put real secrets, patient information, payment data, or private prompts in
 this project. The framework is a foundation, not a complete production firewall.
+
+The local browser workspace may keep optional synthetic result history. Clear it
+from advanced settings after review. Exported reports are operator artifacts and
+must be inspected before sharing; server audit files remain metadata-only.
 
 AI-agent instructions and memory are in AGENTS.md and .ai/.
 

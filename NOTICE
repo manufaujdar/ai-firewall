@@ -1,0 +1,7 @@
+AI Firewall
+Copyright 2026 Manu Faujdar
+
+This product includes software developed for the AI Firewall project.
+
+The project-local agent-role workflow is inspired by the separation-of-concerns approach in
+manufaujdar/gstack. The role instructions and implementation in this repository are original.

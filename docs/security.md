@@ -1,36 +1,42 @@
 # Security notes
 
-- Bind the development service to `127.0.0.1`; do not expose it publicly without authentication and TLS.
-- Keep provider credentials in a secret manager or inject them within provider adapters.
-- Avoid logging prompts, headers, matches, or redacted source values.
-- Treat regex rules as one detection layer. They can produce false positives and can be bypassed with encoding or fragmentation.
-- Validate DNS/IP destinations in production to prevent redirects or DNS rebinding to private networks.
-- Enforce maximum decompressed body size and add parsers for file uploads before allowing multipart data.
+- Bind the development service to `127.0.0.1`; do not expose it publicly without authentication,
+  TLS, rate limits, and a reviewed deployment boundary.
+- Keep provider credentials in a secret manager and inject them only within future provider adapters.
+- Never log prompts, headers, matches, redacted source values, or exported operator reports.
+- Treat regular expressions as one detection layer. They produce false positives and can be bypassed
+  through context, encoding, fragmentation, normalization, or unsupported media.
 - Protect policies and binaries from local tampering if this becomes an endpoint control.
-- Obtain legal and employee-consent review before inspecting user traffic or deploying TLS interception.
+- Obtain legal and employee-consent review before inspecting traffic or considering TLS interception.
+- Treat browser-local history and exported reports as operator artifacts that may contain sanitized
+  content. Clear or protect them according to local policy.
 
 ## Current enforced boundaries
 
-- Scan and proxy routes require the dedicated local API-key header; a missing server key makes
-  protected routes unavailable. Liveness remains unauthenticated and returns status only.
-- Readiness fails with one generic response when authentication is unconfigured or the
-  metadata-only audit sink cannot be opened. It does not expose key or filesystem details.
-- Request bodies are bounded before JSON parsing, and malformed or conflicting content lengths
-  are rejected.
+- Scan and policy routes require a dedicated local API-key header; missing server key material makes
+  protected routes unavailable. Liveness returns status only.
+- Readiness fails with one generic response when authentication is unconfigured or the metadata-only
+  audit sink cannot be opened. It exposes no key or filesystem details.
+- Request bodies are bounded before JSON parsing; malformed or conflicting content lengths reject.
+- JSON traversal bounds depth and node count and rejects unsupported, cyclic, or non-finite values.
 - Interactive API documentation is disabled and local Host headers are allowlisted.
-- Proxy destinations require HTTPS, an exact configured hostname, port 443, and DNS answers that
-  are all globally routable. Redirects and environment proxy settings are disabled.
-- All caller headers are discarded at the outbound boundary, including authorization headers.
-- Proxy forwarding cannot be enabled by configuration in this milestone.
+- Browser responses deny framing, MIME sniffing, referrer disclosure, sensitive device APIs, and
+  content loads outside the local origin through restrictive response headers.
+- Destinations require HTTPS, an exact configured hostname, port 443, and globally routable DNS
+  answers. Redirects and environment proxy settings are disabled.
+- Caller headers are discarded at the outbound boundary, including authorization headers.
+- Proxy forwarding cannot be enabled by environment configuration in this milestone.
 
-Connection pinning to the validated DNS answer and provider-specific local credential injection
-are not implemented yet. Until both are complete, treat proxy forwarding as a development feature,
-not a production SSRF boundary.
+Connection pinning to the validated DNS answer, provider-specific credential injection, final-byte
+rescan, and response bounds are not implemented. Forwarding is therefore unavailable. Files, media,
+encoded or fragmented secrets, Unicode confusables, streaming data, and semantic personal-data
+detection remain unsupported. A redacted decision is not proof that no sensitive information remains.
 
 ## Supply-chain limitations
 
-GitHub Actions are pinned to immutable commit SHAs. The Python dependency declarations still use
-bounded version ranges without a hash-locked resolution, and the Docker base image still uses a
-mutable tag rather than a verified digest. These gaps remain open until maintainers generate and
-review a lockfile and image digest through an approved release process; no hashes or digests are
-guessed in this repository.
+GitHub Actions are pinned to immutable commit SHAs. Python declarations use bounded version ranges
+without a hash-locked resolution, and the Docker base image uses a mutable tag. Maintainers must
+generate and review a lockfile and image digest during a separately approved release process; this
+repository does not invent hashes or claim reproducible builds without them.
+
+See `limitations.md`, `validation-protocol.md`, and `provenance.md`.

@@ -30,7 +30,7 @@ def test_local_console_is_available_without_exposing_configuration(tmp_path: Pat
     with TestClient(app) as client:
         response = client.get("/")
     assert response.status_code == 200
-    assert "AI Firewall local console" in response.text
+    assert "AI Firewall · Local review workspace" in response.text
     assert AUTH_HEADERS["x-ai-firewall-api-key"] not in response.text
 
 
