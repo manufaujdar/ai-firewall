@@ -1,6 +1,10 @@
 # AI Firewall
 
-AI Firewall is a starter framework for preventing accidental sensitive-data leakage when local applications call cloud AI or LLM APIs. It runs as a local gateway, inspects outbound JSON payloads, and either allows, redacts, or blocks the request according to policy.
+AI Firewall is a privacy research framework for de-identifying sensitive
+information in clinical and other high-risk AI workflows. It prevents accidental
+sensitive-data leakage when local applications call cloud AI or LLM APIs by
+running as a local gateway that inspects outbound JSON payloads and either
+allows, redacts, or blocks the request according to policy.
 
 ## What is included
 
