@@ -1,4 +1,13 @@
-# AI Firewall security review and implementation blueprint
+# AI Firewall historical security review and implementation blueprint
+
+> **Status update (2026-08-10):** this document preserves the original baseline review and target
+> architecture. The repository has since implemented strict default-block policy validation,
+> request limits, local API-key authentication, HTTPS/DNS destination validation, caller-header
+> stripping, disabled-by-configuration forwarding, generic readiness, trusted Host enforcement,
+> browser security headers, and substantially expanded synthetic tests. Connection pinning, local
+> provider credential injection, residual serialized-byte scanning, audit hardening, broad content
+> parsing, local models, signed artifacts, and OS/network enforcement remain open. Use
+> `docs/security.md` and `docs/limitations.md` for the current authoritative boundary.
 
 ## Executive summary
 
@@ -22,9 +31,11 @@ high-risk finding, the request must be blocked. No system can promise prevention
 the realistic goal is layered controls, measurable coverage, fail-closed handling, and OS/network
 enforcement so applications cannot bypass the gateway.
 
-## Scope and validation
+## Original scope and validation
 
-Reviewed all source, tests, policy, deployment files, and the project-required documentation.
+The statements below record the repository state at the time of the original review; they are not
+current test results. The original review covered all then-existing source, tests, policy,
+deployment files, and project-required documentation.
 The codebase is Python 3.11+ with FastAPI, Pydantic, HTTPX, and PyYAML.
 
 - `ruff check .`: passed.

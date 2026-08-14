@@ -30,7 +30,7 @@ def test_local_console_is_available_without_exposing_configuration(tmp_path: Pat
     with TestClient(app) as client:
         response = client.get("/")
     assert response.status_code == 200
-    assert "AI Firewall local console" in response.text
+    assert "AI Firewall · Local review workspace" in response.text
     assert AUTH_HEADERS["x-ai-firewall-api-key"] not in response.text
 
 
@@ -199,3 +199,55 @@ def test_proxy_is_disabled_by_default(tmp_path: Path) -> None:
 
     assert response.status_code == 503
     assert not settings.audit_path.exists()
+
+
+def test_realtime_stream_and_history_are_metadata_only(tmp_path: Path) -> None:
+    source = "Contact synthetic.stream@example.com"
+    with TestClient(app) as client:
+        response = client.post(
+            "/v1/privacy/inspect/stream",
+            headers=AUTH_HEADERS,
+            json={"payload": {"prompt": source}},
+        )
+        history = client.get("/v1/privacy/history", headers=AUTH_HEADERS)
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+    privacy_lines = [line for line in response.text.splitlines() if line.startswith("data: ")][:-1]
+    assert privacy_lines
+    assert all(source not in line for line in privacy_lines)
+    assert "event: result" in response.text
+    assert history.status_code == 200
+    assert source not in history.text
+    assert history.json()["storage"] == "local_metadata_only"
+
+
+def test_topology_exposes_real_agents_graph_loops_and_model_state(tmp_path: Path) -> None:
+    with TestClient(app) as client:
+        response = client.get("/v1/privacy/topology", headers=AUTH_HEADERS)
+
+    assert response.status_code == 200
+    topology = response.json()
+    assert topology["mode"] == "local_only"
+    assert topology["payload_persistence"] == "disabled"
+    assert topology["forwarding"] == "disabled"
+    assert topology["agents"]
+    assert topology["graph"]
+    assert topology["bounded_loops"][0]["max_iterations"] == 1
+    assert topology["models"] == []
+
+
+def test_history_is_authenticated_and_can_be_cleared(tmp_path: Path) -> None:
+    with TestClient(app) as client:
+        unauthorized = client.get("/v1/privacy/history")
+        client.post(
+            "/v1/scan",
+            headers=AUTH_HEADERS,
+            json={"payload": "synthetic.history@example.com"},
+        )
+        cleared = client.delete("/v1/privacy/history", headers=AUTH_HEADERS)
+        history = client.get("/v1/privacy/history", headers=AUTH_HEADERS)
+
+    assert unauthorized.status_code == 401
+    assert cleared.json()["deleted"] == 1
+    assert history.json()["items"] == []

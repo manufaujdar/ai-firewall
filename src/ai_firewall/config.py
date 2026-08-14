@@ -13,7 +13,9 @@ class Settings(BaseSettings):
     )
 
     policy_path: Path = Path("config/policy.yaml")
+    models_path: Path = Path("config/models.yaml")
     audit_path: Path = Path("data/audit.jsonl")
+    database_path: Path = Path("data/privacy.db")
     fail_closed: Literal[True] = True
     api_key: str | None = Field(default=None, min_length=32)
     # Proxy transport is intentionally unavailable until DNS pinning and local

@@ -1,23 +1,54 @@
 # Architecture
 
-The starter framework is an explicit local gateway. Applications send outbound AI requests to the gateway instead of directly to a provider. The scanner walks arbitrary JSON, evaluates configured rules, and calculates the strictest applicable action. A destination allowlist reduces server-side request-forgery risk.
+AI Firewall is an explicit local inspection gateway. Applications must deliberately send a JSON
+value to its authenticated API. The scanner evaluates configured rules and calculates the strictest
+applicable action. It is not a transparent device-wide interceptor.
 
 ## Components
 
-- `main.py`: API boundary, destination validation, and upstream forwarding
-- `scanner.py`: recursive content inspection and sanitization; applies the policy default only to
-  unmatched input and blocks detector failures
-- `policy.py`: declarative YAML policy loading
+- `main.py`: API boundary, health/readiness, real-time SSE/topology/history routes, disabled proxy
+  orchestration, and local UI assets
+- `scanner.py`: bounded recursive inspection and deterministic sanitization; applies the policy
+  default only to unmatched input and blocks detector failures
+- `policy.py`: strict versioned YAML policy loading and validation
 - `audit.py`: metadata-only security event logging
-- `config/policy.yaml`: initial rules and approved AI provider hosts
+- `auth.py`: constant-time dedicated local API-key authentication
+- `request_limits.py`: body-size enforcement before JSON parsing
+- `proxy/`: HTTPS destination and caller-header validation contracts
+- `web_ui.py`: dependency-free local review workspace; API keys stay in memory and optional history
+  is metadata-only from the local backend database; browser storage is not used
+- `privacy/orchestrator.py`: explicit local agent graph, strictest decision, residual scan, events,
+  and fail-closed persistence
+- `privacy/events.py`: ordered metadata-key-allowlisted real-time events
+- `privacy/database.py`: restrictive local SQLite metadata store; no payload columns
+- `privacy/models.py`: offline pinned model manifest, artifact health, deadlines, and structured span
+  validation
+- `config/models.yaml`: empty-by-default local model registry; no runtime downloads
+- `scripts/review_frontend.py`: deterministic network-free source review of frontend quality signals
+- `config/policy.yaml`: current rules and approved provider-host metadata
 
 `/health` is dependency-free process liveness. `/ready` checks only whether server authentication
-is configured and the audit sink is appendable, returning no dependency details on failure.
+is configured and the audit sink is appendable, returning no dependency details on failure. The
+authenticated policy summary never exposes executable regular expressions.
+
+## Current data flow
+
+Trusted local Host -> body-size gate -> API-key authentication -> strict request model -> bounded
+JSON traversal -> deterministic rules and validators -> optional pinned local-model gate ->
+deterministic redaction -> residual serialized-output scan -> strictest action -> metadata-only
+audit and SQLite. Each phase can emit a metadata-only event before the final local response.
+
+Destination and header modules define fail-closed contracts, but transport is intentionally
+configuration-disabled. Validated DNS evidence is not yet pinned to the eventual connection, local
+provider credentials are not injected, and the serialized outbound representation is not rescanned.
 
 ## Natural next layers
 
-1. Add provider adapters that inject credentials locally and normalize streaming APIs.
-2. Add entropy detection, file parsers, OCR, and a trained named-entity recognizer.
-3. Add identity-aware policy, exceptions, signed policies, and tamper protection.
-4. Add endpoint enforcement through managed proxy/PAC settings, an OS network extension, or an enterprise egress gateway.
-5. Inspect streaming and multimodal requests and apply equivalent controls to responses.
+1. Add bounded canonicalization, encoding/fragmentation detectors, residual serialized-byte scans,
+   and an explicit low-risk allow policy.
+2. Add pinned offline NER with structured spans, health gates, and deterministic replacements.
+3. Add provider adapters that inject credentials locally and pin validated connections.
+4. Add sandboxed parsers, OCR, archives, and bounded streaming only after validation.
+5. Add identity-aware policy, signed artifacts, tamper-evident audit, and OS/network enforcement.
+
+See `limitations.md` for the authoritative supported-content and deployment boundary.

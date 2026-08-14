@@ -1,10 +1,35 @@
 services:
   ai-firewall:
     build: .
+    init: true
     ports:
       - "127.0.0.1:8080:8080"
+    environment:
+      AI_FIREWALL_API_KEY: ${AI_FIREWALL_API_KEY:?set a generated local API key of at least 32 characters}
+      AI_FIREWALL_POLICY_PATH: /app/config/policy.yaml
+      AI_FIREWALL_MODELS_PATH: /app/config/models.yaml
+      AI_FIREWALL_AUDIT_PATH: /app/data/audit.jsonl
+      AI_FIREWALL_DATABASE_PATH: /app/data/privacy.db
     volumes:
       - ./config:/app/config:ro
-      - ./data:/app/data
+      - ai-firewall-data:/app/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2)"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
 
+volumes:
+  ai-firewall-data:

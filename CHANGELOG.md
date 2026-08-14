@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Prepared version 0.1.1 with a calmer accessible local review workspace, local-only synthetic
+  history, report downloads, copyable qualified review briefs, and explicit quality gates.
+- Added Apache-2.0 release metadata, citation, governance, conduct, compliance, validation,
+  provenance, model-card, dataset-card, pull-request, and Dependabot guidance.
+- Added a deterministic local frontend review and regression tests without external AI calls.
+
 - Added a loopback local scan/policy console for synthetic API verification; it
   stores no API key and does not enable forwarding.
 

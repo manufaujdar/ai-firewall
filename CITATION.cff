@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this research prototype, please cite it using this metadata."
+title: "AI Firewall: a local-first AI data-loss-prevention research framework"
+type: software
+version: 0.1.1
+date-released: 2026-08-10
+authors:
+  - family-names: Faujdar
+    given-names: Manu
+repository-code: "https://github.com/manufaujdar/ai-firewall"
+license: Apache-2.0
+keywords:
+  - data loss prevention
+  - artificial intelligence
+  - privacy
+  - security research
