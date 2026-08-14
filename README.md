@@ -127,3 +127,5 @@ assistive-technology, and security review are still required.
 
 Licensed under the [Apache License 2.0](LICENSE). Citation metadata is provided in
 [`CITATION.cff`](CITATION.cff). See [`NOTICE`](NOTICE) for attribution information.
+The source-only privacy and self-hosting boundary is in
+[`PRIVACY_AND_DATA_BOUNDARY.md`](PRIVACY_AND_DATA_BOUNDARY.md).

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added `PRIVACY_AND_DATA_BOUNDARY.md` and linked it from the README to distinguish the Apache-2.0 source license from deployment-specific privacy and service terms.
 - Prepared version 0.1.1 with a calmer accessible local review workspace, local-only synthetic
   history, report downloads, copyable qualified review briefs, and explicit quality gates.
 - Added Apache-2.0 release metadata, citation, governance, conduct, compliance, validation,
