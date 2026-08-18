@@ -1,8 +1,6 @@
 # AI Firewall
 
-AI Firewall is a local-first, open-source research framework for inspecting structured information
-before an application sends it to a cloud AI or large-language-model service. It applies a strict
-local policy and returns an `allow`, `redact`, or `block` decision with metadata-safe findings.
+Cloud AI calls can carry more sensitive information than a team realizes. AI Firewall is a local-first, open-source research framework that inspects structured data before it leaves an application, then allows, redacts, or blocks the request according to an explicit policy. It is designed as a privacy control for regulated workflows, not as a complete endpoint-security or data-loss-prevention product.
 
 > **Research boundary:** this is not a complete endpoint-security or data-loss-prevention product.
 > It only protects requests deliberately integrated with its API. It has no claim of preventing
