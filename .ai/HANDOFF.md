@@ -15,3 +15,13 @@ checks pass. A real container boot was unavailable because Docker was not runnin
 has been validated for the requested commit and push. Remaining enterprise work is tracked in
 `docs/privacy-enhancement-plan.md`; device-wide egress enforcement and regulated-production
 assurance are not claimed.
+
+
+## Completed local tooling — Spec Kit (2026-10-03)
+
+Pinned v1.1.0 core + bug/assess Codex skills installed. Read .specify/INTEGRATION.md;
+existing tracker/role/privacy/human gates retain authority. Hashes, 18 commands,
+links, JSON, Bash and local-root checks pass; disposable feature/plan/tasks and
+external/traversal/symlink negative checks pass. No application/runtime or hosted
+change. Active role: local tooling release/handoff. Next owner: selected project
+product/engineering owner for an authorized task. Existing approval gates apply.

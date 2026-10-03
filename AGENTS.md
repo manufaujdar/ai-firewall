@@ -28,3 +28,14 @@ Use the project-local gstack-inspired roles documented in `docs/agent-team.md`:
 For parallel work, give each agent non-overlapping file ownership. The primary agent owns shared
 entrypoints, integration, and final validation. A role never overrides the fail-closed, synthetic-
 fixture, metadata-only audit, allowlist, or dependency rules above.
+
+
+## Spec Kit development workflow
+
+GitHub Spec Kit v1.1.0 Codex commands are installed locally. Read
+`.specify/INTEGRATION.md` before using `$speckit-*`. Use the feature, bug or
+assessment chain for an authorized bounded task; small edits need no full spec.
+Existing instructions, trackers, role routing, privacy and human gates retain
+authority. Generated specs/tasks are supporting evidence, not another backlog.
+No external issue creation, paid/provider workflow, Git or release action is
+implied by installation. Source/license/hashes: `.specify/adoption.json`.
