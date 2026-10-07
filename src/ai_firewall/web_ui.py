@@ -78,7 +78,7 @@ CONSOLE_HTML = """<!doctype html>
         <div><p class="step">02 · Review</p><h2 id="results-title">Inspection result</h2></div>
         <span id="decision" class="decision">—</span>
       </div>
-      <div class="metrics" aria-label="Result summary">
+      <div id="scan-summary"><div class="metrics" aria-label="Result summary">
         <div><span>Decision</span><strong id="metric-decision">—</strong></div>
         <div><span>Findings</span><strong id="metric-findings">0</strong></div>
         <div><span>Rules triggered</span><strong id="metric-rules">0</strong></div>
@@ -87,6 +87,7 @@ CONSOLE_HTML = """<!doctype html>
       <div id="warnings" class="warnings"></div>
       <h3>Real-time privacy events</h3>
       <ol id="event-timeline" class="event-timeline" aria-live="polite"></ol>
+      </div>
       <h3>Structured scan result</h3>
       <pre id="result" tabindex="0">No result yet.</pre>
       <div class="result-actions">
@@ -131,8 +132,8 @@ CONSOLE_HTML = """<!doctype html>
 
 CONSOLE_CSS = r"""
 :root{color-scheme:light;--ink:#15231e;--muted:#62706a;--paper:#f6f5ef;--surface:#fffefa;--line:#d9ddd6;--accent:#176b52;--accent-dark:#0d4d3a;--warn:#8a4b12;--warn-bg:#fff5df;--danger:#9c2d25;--danger-bg:#fff0ed;--ok:#236c43;--ok-bg:#edf8f1;--shadow:0 16px 40px rgba(21,35,30,.07)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea{font:inherit}a{color:inherit;text-underline-offset:.2em}.skip-link{position:fixed;left:1rem;top:-5rem;z-index:20;background:var(--ink);color:white;padding:.75rem 1rem;border-radius:.4rem}.skip-link:focus{top:1rem}.site-header{min-height:76px;display:flex;align-items:center;gap:2rem;padding:0 clamp(1rem,5vw,4rem);background:rgba(255,254,250,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;margin-right:auto}.brand span{display:grid;line-height:1.15}.brand small{font-size:.72rem;color:var(--muted);margin-top:.18rem}.mark{width:38px;height:38px}.mark path:first-child{fill:#dfeee8;stroke:var(--accent);stroke-width:1.4}.mark path:last-child{fill:none;stroke:var(--accent);stroke-width:1.3;stroke-linecap:round}.site-header nav{display:flex;gap:1.35rem}.site-header nav a{text-decoration:none;font-size:.9rem;color:#45524d}.local-badge{font-size:.78rem;border:1px solid var(--line);padding:.35rem .62rem;border-radius:999px;white-space:nowrap}.local-badge span{display:inline-block;width:.45rem;height:.45rem;background:var(--ok);border-radius:50%;margin-right:.35rem}main{width:min(1040px,calc(100% - 2rem));margin:0 auto;padding:5rem 0}.intro{max-width:760px;margin-bottom:2rem}.eyebrow,.step{color:var(--accent);font-size:.75rem;font-weight:750;text-transform:uppercase;letter-spacing:.12em;margin:0 0 .6rem}h1{font-family:Georgia,serif;font-size:clamp(2.45rem,7vw,4.75rem);font-weight:500;line-height:1.02;letter-spacing:-.045em;margin:.2rem 0 1.25rem}h2{font-family:Georgia,serif;font-size:clamp(1.7rem,4vw,2.4rem);font-weight:500;letter-spacing:-.025em;margin:0}h3{font-size:1rem;margin:1.2rem 0 .5rem}.lede{font-size:1.15rem;color:#4c5b55;max-width:690px}.notice{background:var(--warn-bg);border:1px solid #ead5a9;border-radius:.65rem;padding:1rem 1.15rem;margin:2rem 0}.notice strong{display:block}.panel{background:var(--surface);border:1px solid var(--line);border-radius:.8rem;padding:clamp(1.15rem,4vw,2rem);box-shadow:var(--shadow);margin:1.25rem 0}.section-heading{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}.section-heading .step{margin-bottom:.25rem}.status,.decision{font-size:.78rem;font-weight:700;padding:.35rem .65rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.status.ok,.decision.redact{color:var(--ok);background:var(--ok-bg);border-color:#bbddc7}.decision.block{color:var(--danger);background:var(--danger-bg);border-color:#efc4be}.decision.allow{color:var(--ok);background:var(--ok-bg);border-color:#bbddc7}label{display:block;font-weight:700;margin:.8rem 0 .4rem}label span{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:.3rem}textarea,input{width:100%;border:1px solid #bfc7c1;background:white;color:var(--ink);border-radius:.45rem;padding:.8rem}textarea{min-height:215px;resize:vertical;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}input{min-height:46px}.help,.muted{color:var(--muted);font-size:.84rem}.primary,.secondary,.quiet{border-radius:.4rem;padding:.72rem 1rem;font-weight:700;cursor:pointer}.primary{display:block;width:100%;background:var(--accent);color:white;border:1px solid var(--accent);margin-top:1.4rem}.primary:hover{background:var(--accent-dark)}.secondary{background:white;color:var(--accent-dark);border:1px solid #aebdb6}.quiet{background:transparent;color:#5b6661;border:1px solid transparent}.action-status{text-align:center;color:var(--muted);font-size:.87rem;margin:.55rem 0 0}button:disabled{opacity:.55;cursor:wait}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,pre:focus-visible{outline:3px solid #e1a33f;outline-offset:3px}details{margin-top:1.5rem;border-top:1px solid var(--line);padding-top:1rem}summary{font-weight:700;cursor:pointer;width:max-content;max-width:100%}.details-grid{display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:end;margin-top:1rem}.button-stack{display:flex;gap:.5rem;flex-wrap:wrap}.metrics{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:.55rem;overflow:hidden}.metrics div{padding:1rem;border-right:1px solid var(--line)}.metrics div:last-child{border:0}.metrics span{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.3rem}.metrics strong{font-size:1.05rem;text-transform:capitalize}.warnings{margin:1rem 0}.warning{padding:.7rem .85rem;background:var(--warn-bg);border-left:3px solid #d08a2f;margin:.5rem 0;font-size:.9rem}.event-timeline{display:grid;gap:.45rem;padding:0;list-style:none}.event-timeline li{display:flex;justify-content:space-between;gap:1rem;border-left:3px solid var(--accent);background:#f1f6f3;padding:.55rem .7rem;font-size:.86rem}.event-timeline li span:last-child{color:var(--muted)}pre{max-height:370px;overflow:auto;background:#14231e;color:#eaf3ee;border-radius:.55rem;padding:1rem;white-space:pre-wrap;word-break:break-word;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}.result-actions{display:flex;gap:.7rem;flex-wrap:wrap}.empty{padding:2rem;text-align:center;color:var(--muted);border:1px dashed #bdc7c0;border-radius:.55rem}.history-list{display:grid;gap:.6rem}.history-item{display:flex;justify-content:space-between;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--line)}.history-item:last-child{border:0}.history-item strong{text-transform:capitalize}.method{padding:5rem 0 1.5rem}.method>h2{max-width:620px}.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}.method article{border-top:2px solid var(--accent);padding-top:1rem}.method article>span{font:1.7rem Georgia,serif;color:#8aa99d}.method article p{color:var(--muted);font-size:.9rem}footer{background:#14231e;color:#e9f0ec;display:flex;justify-content:space-between;gap:2rem;padding:2.5rem clamp(1rem,5vw,4rem)}footer p{font-size:.85rem;color:#aebcb6;margin:.3rem 0}footer nav{display:flex;gap:1.2rem;align-items:center;font-size:.85rem}
-@media(max-width:720px){.site-header{min-height:68px}.site-header nav{display:none}.brand small{display:none}main{padding:3rem 0}.metrics{grid-template-columns:1fr 1fr}.metrics div:nth-child(2){border-right:0}.metrics div:nth-child(-n+2){border-bottom:1px solid var(--line)}.details-grid,.method-grid{grid-template-columns:1fr}.button-stack{align-items:start}.button-stack button{width:100%}footer{display:block}footer nav{margin-top:1.5rem;flex-wrap:wrap}h1{font-size:2.7rem}}
+[hidden]{display:none!important}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:6rem}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,textarea{font:inherit}a{color:inherit;text-underline-offset:.2em}.skip-link{position:fixed;left:1rem;top:-5rem;z-index:20;background:var(--ink);color:white;padding:.75rem 1rem;border-radius:.4rem}.skip-link:focus{top:1rem}.site-header{min-height:76px;display:flex;align-items:center;gap:2rem;padding:0 clamp(1rem,5vw,4rem);background:rgba(255,254,250,.95);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;margin-right:auto}.brand span{display:grid;line-height:1.15}.brand small{font-size:.72rem;color:var(--muted);margin-top:.18rem}.mark{width:38px;height:38px}.mark path:first-child{fill:#dfeee8;stroke:var(--accent);stroke-width:1.4}.mark path:last-child{fill:none;stroke:var(--accent);stroke-width:1.3;stroke-linecap:round}.site-header nav{display:flex;gap:1.35rem}.site-header nav a{text-decoration:none;font-size:.9rem;color:#45524d}.local-badge{font-size:.78rem;border:1px solid var(--line);padding:.35rem .62rem;border-radius:999px;white-space:nowrap}.local-badge span{display:inline-block;width:.45rem;height:.45rem;background:var(--ok);border-radius:50%;margin-right:.35rem}main{width:min(1040px,calc(100% - 2rem));margin:0 auto;padding:5rem 0}.intro{max-width:760px;margin-bottom:2rem}.eyebrow,.step{color:var(--accent);font-size:.75rem;font-weight:750;text-transform:uppercase;letter-spacing:.12em;margin:0 0 .6rem}h1{font-family:Georgia,serif;font-size:clamp(2.45rem,7vw,4.75rem);font-weight:500;line-height:1.02;letter-spacing:-.045em;margin:.2rem 0 1.25rem}h2{font-family:Georgia,serif;font-size:clamp(1.7rem,4vw,2.4rem);font-weight:500;letter-spacing:-.025em;margin:0}h3{font-size:1rem;margin:1.2rem 0 .5rem}.lede{font-size:1.15rem;color:#4c5b55;max-width:690px}.notice{background:var(--warn-bg);border:1px solid #ead5a9;border-radius:.65rem;padding:1rem 1.15rem;margin:2rem 0}.notice strong{display:block}.panel{background:var(--surface);border:1px solid var(--line);border-radius:.8rem;padding:clamp(1.15rem,4vw,2rem);box-shadow:var(--shadow);margin:1.25rem 0}.section-heading{display:flex;align-items:start;justify-content:space-between;gap:1rem;margin-bottom:1.5rem}.section-heading .step{margin-bottom:.25rem}.status,.decision{font-size:.78rem;font-weight:700;padding:.35rem .65rem;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.status.ok,.decision.redact{color:var(--ok);background:var(--ok-bg);border-color:#bbddc7}.decision.block{color:var(--danger);background:var(--danger-bg);border-color:#efc4be}.decision.allow{color:var(--ok);background:var(--ok-bg);border-color:#bbddc7}label{display:block;font-weight:700;margin:.8rem 0 .4rem}label span{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:.3rem}textarea,input{width:100%;border:1px solid #bfc7c1;background:white;color:var(--ink);border-radius:.45rem;padding:.8rem}textarea{min-height:215px;resize:vertical;font:14px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}input{min-height:46px}.help,.muted{color:var(--muted);font-size:.84rem}.primary,.secondary,.quiet{border-radius:.4rem;padding:.72rem 1rem;font-weight:700;cursor:pointer}.primary{display:block;width:100%;background:var(--accent);color:white;border:1px solid var(--accent);margin-top:1.4rem}.primary:hover{background:var(--accent-dark)}.secondary{background:white;color:var(--accent-dark);border:1px solid #aebdb6}.quiet{background:transparent;color:#5b6661;border:1px solid transparent}.action-status{text-align:center;color:var(--muted);font-size:.87rem;margin:.55rem 0 0}button:disabled{opacity:.55;cursor:wait}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,pre:focus-visible{outline:3px solid #e1a33f;outline-offset:3px}details{margin-top:1.5rem;border-top:1px solid var(--line);padding-top:1rem}summary{font-weight:700;cursor:pointer;width:max-content;max-width:100%}.details-grid{display:grid;grid-template-columns:1fr auto;gap:1.5rem;align-items:end;margin-top:1rem}.button-stack{display:flex;gap:.5rem;flex-wrap:wrap}.metrics{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:.55rem;overflow:hidden}.metrics div{padding:1rem;border-right:1px solid var(--line)}.metrics div:last-child{border:0}.metrics span{display:block;font-size:.75rem;color:var(--muted);margin-bottom:.3rem}.metrics strong{font-size:1.05rem;text-transform:capitalize}.warnings{margin:1rem 0}.warning{padding:.7rem .85rem;background:var(--warn-bg);border-left:3px solid #d08a2f;margin:.5rem 0;font-size:.9rem}.event-timeline{display:grid;gap:.45rem;padding:0;list-style:none}.event-timeline li{display:flex;justify-content:space-between;gap:1rem;border-left:3px solid var(--accent);background:#f1f6f3;padding:.55rem .7rem;font-size:.86rem}.event-timeline li span:last-child{color:var(--muted)}pre{max-height:370px;overflow:auto;background:#14231e;color:#eaf3ee;border-radius:.55rem;padding:1rem;white-space:pre-wrap;word-break:break-word;font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}.result-actions{display:flex;gap:.7rem;flex-wrap:wrap}.empty{padding:2rem;text-align:center;color:var(--muted);border:1px dashed #bdc7c0;border-radius:.55rem}.history-list{display:grid;gap:.6rem}.history-item{display:flex;justify-content:space-between;gap:1rem;padding:.8rem 0;border-bottom:1px solid var(--line)}.history-item:last-child{border:0}.history-item strong{text-transform:capitalize}.method{padding:5rem 0 1.5rem}.method>h2{max-width:620px}.method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}.method article{border-top:2px solid var(--accent);padding-top:1rem}.method article>span{font:1.7rem Georgia,serif;color:#8aa99d}.method article p{color:var(--muted);font-size:.9rem}footer{background:#14231e;color:#e9f0ec;display:flex;justify-content:space-between;gap:2rem;padding:2.5rem clamp(1rem,5vw,4rem)}footer p{font-size:.85rem;color:#aebcb6;margin:.3rem 0}footer nav{display:flex;gap:1.2rem;align-items:center;font-size:.85rem}
+@media(max-width:720px){.site-header{min-height:68px;gap:.75rem;padding-block:.75rem}.site-header nav{display:none}.brand small{display:none}main{padding:3rem 0}.metrics{grid-template-columns:1fr 1fr}.metrics div:nth-child(2){border-right:0}.metrics div:nth-child(-n+2){border-bottom:1px solid var(--line)}.details-grid,.method-grid{grid-template-columns:1fr}.button-stack{align-items:start}.button-stack button{width:100%}footer{display:block}footer nav{margin-top:1.5rem;flex-wrap:wrap}h1{font-size:2.7rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 """
 
@@ -223,6 +224,8 @@ function renderResult(record) {
   lastRecord = record;
   const result = record.response;
   $('#results-panel').hidden = false;
+  $('#scan-summary').hidden = false;
+  $('.result-actions').hidden = false;
   $('#decision').textContent = result.decision;
   $('#decision').className = `decision ${result.decision}`;
   $('#metric-decision').textContent = result.decision;
@@ -258,8 +261,9 @@ function makeBrief(record) {
 
 async function refreshHistory() {
   if (!$('#key').value) return;
+  try {
   const response = await fetch('/v1/privacy/history', {headers: headers()});
-  if (!response.ok) return;
+  if (!response.ok) throw new Error(`History unavailable (${response.status}).`);
   const value = await jsonResponse(response);
   const records = value.items || [];
   $('#history-count').textContent = `${records.length} saved`;
@@ -285,6 +289,10 @@ async function refreshHistory() {
     row.append(left, rules);
     return row;
   }));
+  } catch {
+    $('#history-count').textContent = 'Unavailable';
+    $('#history').textContent = 'History could not be loaded. Check the local connection and key, then try again.';
+  }
 }
 
 $('#scan').addEventListener('click', async () => {
@@ -317,25 +325,39 @@ $('#scan').addEventListener('click', async () => {
   } finally { setBusy(false); }
 });
 
-$('#policy').addEventListener('click', async () => {
-  const response = await fetch('/v1/policy', {headers: headers()});
-  const value = await jsonResponse(response);
-  $('#results-panel').hidden = false;
-  $('#result').textContent = JSON.stringify(value, null, 2);
-  await refreshHistory();
-});
-
-$('#topology').addEventListener('click', async () => {
-  const response = await fetch('/v1/privacy/topology', {headers: headers()});
-  const value = await jsonResponse(response);
-  $('#results-panel').hidden = false;
-  $('#result').textContent = JSON.stringify(value, null, 2);
-  $('#results-panel').scrollIntoView({behavior: 'smooth'});
-});
+for (const [id, path, label] of [
+  ['policy', '/v1/policy', 'Policy summary'],
+  ['topology', '/v1/privacy/topology', 'Runtime topology'],
+]) {
+  $(`#${id}`).addEventListener('click', async (event) => {
+    event.currentTarget.disabled = true;
+    $('#scan-status').textContent = `Loading ${label.toLowerCase()}…`;
+    try {
+      const response = await fetch(path, {headers: headers()});
+      if (!response.ok) throw new Error(`Request failed (${response.status}).`);
+      const value = await response.json();
+      lastRecord = null;
+      $('#results-panel').hidden = false;
+      $('#scan-summary').hidden = true;
+      $('.result-actions').hidden = true;
+      $('#decision').className = 'decision';
+      $('#decision').textContent = label;
+      $('#result').textContent = JSON.stringify(value, null, 2);
+      $('#scan-status').textContent = `${label} loaded.`;
+      $('#results-panel').scrollIntoView({block: 'start'});
+    } catch {
+      $('#scan-status').textContent = `${label} unavailable. Check the local connection and API key, then retry.`;
+    } finally { $(`#${id}`).disabled = false; }
+  });
+}
 
 $('#clear-history').addEventListener('click', async () => {
-  await fetch('/v1/privacy/history', {method: 'DELETE', headers: headers()});
-  await refreshHistory();
+  try {
+    const response = await fetch('/v1/privacy/history', {method: 'DELETE', headers: headers()});
+    if (!response.ok) throw new Error('History could not be cleared.');
+    await refreshHistory();
+    $('#scan-status').textContent = 'Local metadata history cleared.';
+  } catch { $('#scan-status').textContent = 'History could not be cleared. Check the local connection and key, then retry.'; }
 });
 
 $('#download').addEventListener('click', () => {

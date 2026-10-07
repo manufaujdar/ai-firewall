@@ -25,3 +25,14 @@ links, JSON, Bash and local-root checks pass; disposable feature/plan/tasks and
 external/traversal/symlink negative checks pass. No application/runtime or hosted
 change. Active role: local tooling release/handoff. Next owner: selected project
 product/engineering owner for an authorized task. Existing approval gates apply.
+
+
+## Oil UI local pass — 2026-10-07
+
+- Objective: implement minimal UI/UX corrections under the authorized portfolio request; existing trackers and unrelated work preserved.
+- Files: src/ai_firewall/web_ui.py.
+- Result: Visible secondary-request/history errors, busy actions, stale scan/export visibility and narrow header.
+- Verification: Five existing frontend/API asset tests, scoped Ruff, Python/JS syntax and synthetic failure/retry/reflow pass.
+- Coverage/limits: Populated scan/history, download and complete keyboard journey remain pending; broader backend suite not rerun.
+- Evidence and upstream provenance: [portfolio report](../../UI_UX_REVIEW_2026-10-07.md), [Oil UI method/helper](../../resources/code-review/OIL_UI_REVIEW.md). This is an affected UI slice, not a renewed whole-repository audit.
+- Active gear: release review. Next owner: Product/UI owner. No new approval pending for these local edits; existing release/governance gates remain. No commit, push, deployment, provider call or publication.
