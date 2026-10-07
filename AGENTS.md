@@ -28,3 +28,9 @@ Use the project-local gstack-inspired roles documented in `docs/agent-team.md`:
 For parallel work, give each agent non-overlapping file ownership. The primary agent owns shared
 entrypoints, integration, and final validation. A role never overrides the fail-closed, synthetic-
 fixture, metadata-only audit, allowlist, or dependency rules above.
+
+## Shared AI-agent resources
+
+When a task needs a shared role or resource, read [MASTER_AI_AGENTS.md](MASTER_AI_AGENTS.md).
+Select only the relevant definition. Existing project roles, scoped instructions,
+data boundaries, source-of-truth records, and release gates retain authority.
