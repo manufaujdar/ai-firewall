@@ -67,7 +67,6 @@ CONSOLE_HTML = """<!doctype html>
           <div class="button-stack">
             <button id="policy" class="secondary" type="button">Review policy summary</button>
             <button id="topology" class="secondary" type="button">Inspect runtime topology</button>
-            <button id="clear-history" class="quiet" type="button">Clear local history</button>
           </div>
         </div>
       </details>
@@ -102,7 +101,13 @@ CONSOLE_HTML = """<!doctype html>
         <div><p class="step">03 · Review</p><h2 id="history-title">Local metadata history</h2></div>
         <span id="history-count" class="muted">0 saved</span>
       </div>
-      <div id="history" class="empty">Enter the local key to load metadata-only history.</div>
+      <p class="help">Metadata only, saved by this local server. Enter your key under Connection, then refresh.</p>
+      <div class="button-stack">
+        <button id="refresh-history" class="secondary" type="button">Load / refresh history</button>
+        <button id="clear-history" class="quiet" type="button">Clear local metadata history</button>
+      </div>
+      <p id="history-status" class="help" role="status"></p>
+      <div id="history" class="empty">Refresh to load metadata-only history.</div>
     </section>
 
     <section id="method" class="method" aria-labelledby="method-title">
@@ -236,7 +241,7 @@ function renderResult(record) {
     item.textContent = message;
     return item;
   }));
-  $('#results-panel').scrollIntoView({behavior: 'smooth', block: 'start'});
+  $('#results-panel').scrollIntoView({block: 'start'});
 }
 
 function metadataExport(record) {
@@ -257,12 +262,21 @@ function makeBrief(record) {
 }
 
 async function refreshHistory() {
-  if (!$('#key').value) return;
+  if (!$('#key').value) {
+    $('#history-status').textContent = 'Enter the local API key under Connection before loading history.';
+    $('details').open = true;
+    $('#key').focus();
+    return;
+  }
+  $('#refresh-history').disabled = true;
+  $('#history-status').textContent = 'Loading local metadata history…';
+  try {
   const response = await fetch('/v1/privacy/history', {headers: headers()});
-  if (!response.ok) return;
+  if (!response.ok) throw new Error(`History unavailable (${response.status}).`);
   const value = await jsonResponse(response);
   const records = value.items || [];
   $('#history-count').textContent = `${records.length} saved`;
+  $('#history-status').textContent = 'Local metadata history refreshed.';
   if (!records.length) {
     $('#history').className = 'empty';
     $('#history').textContent = 'No metadata-only inspection summaries saved.';
@@ -285,7 +299,14 @@ async function refreshHistory() {
     row.append(left, rules);
     return row;
   }));
+  } catch {
+    $('#history-status').textContent = 'History could not be refreshed. Retry when the local connection and key are ready.';
+    $('#history-count').textContent = 'Unavailable';
+    $('#history').textContent = 'History could not be loaded. Check the local connection and key, then try again.';
+  } finally { $('#refresh-history').disabled = false; }
 }
+
+$('#refresh-history').addEventListener('click', refreshHistory);
 
 $('#scan').addEventListener('click', async () => {
   let payload;
@@ -330,12 +351,21 @@ $('#topology').addEventListener('click', async () => {
   const value = await jsonResponse(response);
   $('#results-panel').hidden = false;
   $('#result').textContent = JSON.stringify(value, null, 2);
-  $('#results-panel').scrollIntoView({behavior: 'smooth'});
+  $('#results-panel').scrollIntoView({block: 'start'});
 });
 
 $('#clear-history').addEventListener('click', async () => {
-  await fetch('/v1/privacy/history', {method: 'DELETE', headers: headers()});
-  await refreshHistory();
+  if (!$('#key').value) { await refreshHistory(); return; }
+  if (!window.confirm('Permanently clear all local metadata history? This cannot be undone. Raw payloads are never stored.')) return;
+  $('#clear-history').disabled = true;
+  $('#history-status').textContent = 'Clearing local metadata history…';
+  try {
+    const response = await fetch('/v1/privacy/history', {method: 'DELETE', headers: headers()});
+    if (!response.ok) throw new Error('History could not be cleared.');
+    await refreshHistory();
+    $('#history-status').textContent = 'Local metadata history cleared.';
+  } catch { $('#history-status').textContent = 'History could not be cleared. Check the local connection and key, then retry.'; }
+  finally { $('#clear-history').disabled = false; }
 });
 
 $('#download').addEventListener('click', () => {
