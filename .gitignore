@@ -7,3 +7,6 @@ __pycache__/
 .env
 data/*
 !data/.gitkeep
+
+# Local engineering-tool dependencies
+tools/docs-tools/node_modules/
