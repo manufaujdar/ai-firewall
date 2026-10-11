@@ -75,3 +75,9 @@ command, rejects a different outgoing HEAD or extra/non-main refs, and explicitl
 handles an initial all-zero remote SHA. Existing hooks and `core.hooksPath` are
 preserved. The `origin/main` command above is an explicit manual fallback after
 fetching; the hook never substitutes that potentially stale ref for Git's SHA.
+
+The quality extra pins setuptools 83.0.0 because older hosted Python runners
+include vulnerable setuptools 79.0.1 (PYSEC-2026-3447). Installed dependency
+compatibility is checked before the audit; no advisory is ignored.
+Firewall uses pytest-asyncio >=1.3,<2, the first release metadata compatible
+with patched pytest 9; older declared <1 releases require pytest <9.
