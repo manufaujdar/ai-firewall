@@ -1,33 +1,48 @@
 # Documentation index
 
-AI Firewall is a local, bounded privacy/DLP gateway for inspecting outbound AI
-requests; it is not yet a complete endpoint-security product or production
-proxy.
+AI Firewall inspects explicitly integrated JSON requests locally. Forwarding is
+disabled; this alpha is not a complete endpoint-security or production DLP product.
 
-## Authoritative documents
+## Find the right document
 
-- README.md: scope, quick start, and request flow.
-- docs/architecture.md: components and extension boundaries.
-- docs/security.md and SECURITY.md: security boundary and reporting.
-- docs/technical-overview.md: code, technology, API, and validation baseline.
-- AGENTS.md, .ai/, and .codex/skills/firewall-docs: local delivery rules.
+| Task | Start here | Continue with |
+| --- | --- | --- |
+| Install and run a local scan | [README](../README.md) | [Human start page](../START_HERE.txt) |
+| Understand trust and data boundaries | [Security notes](security.md) | [Limitations](limitations.md), [compliance boundary](compliance.md) |
+| Find a component or extension point | [Architecture](architecture.md) | [Technical overview](technical-overview.md) |
+| Plan a privacy capability | [Privacy enhancement plan](privacy-enhancement-plan.md) | [Model card](model-card-template.md), [dataset card](dataset-card-template.md) |
+| Verify a change or prepare a candidate | [Validation protocol](validation-protocol.md) | [Candidate readiness](release-readiness.md), [engineering checks](../TOOLING.md) |
+| Contribute or report a vulnerability | [Contributing](../CONTRIBUTING.md) | [Security reporting](../SECURITY.md), [governance](../GOVERNANCE.md) |
+| Review source and licensing | [Provenance](provenance.md) | [Apache-2.0 license](../LICENSE), [notice](../NOTICE), [citation](../CITATION.cff) |
+| Coordinate agent work | [Agent guide](../AGENTS.md) | [Project team](agent-team.md), [startup team](../.ai/TEAM.md) |
 
-## Initial documentation set
+The [frontend review](frontend-review.md) describes a deterministic source audit;
+its result does not replace browser, assistive-technology or security validation.
+Read the [changelog](../CHANGELOG.md) for recorded changes. Readiness documents
+describe their stated candidate and evidence date, not an automatic release approval.
 
-| Area | Status |
+## Repository organisation
+
+| Location | Owns |
 | --- | --- |
-| Product scope and non-goals | Present |
-| Architecture and request flow | Present |
-| Codebase and module responsibilities | Added |
-| Technology and local operations | Added |
-| API surface and safe defaults | Added |
-| Security and privacy boundary | Present |
-| Tests and validation | Present in CI/tests |
-| License and third-party provenance | Human follow-up; no GitHub license metadata |
+| `src/ai_firewall/` | API, scanner, policy, authentication, UI and privacy/proxy components |
+| `config/` | Machine-readable policy and empty-by-default local model manifest |
+| `tests/` | Synthetic runtime and boundary fixtures |
+| `docs/` | Human-readable architecture, security, limitations, plans and evidence |
+| `scripts/`, `tools/`, `.github/` | Local checks, pinned tool setup and CI workflows |
+| `data/` | Local generated audit/history state; keep private runtime data out of Git |
+| `.ai/`, `.codex/`, `AGENTS.md` | Task continuity, team roles and agent instructions |
+| Root policy and package files | Stable setup, contribution, license, citation and build entry points |
+
+Put new design or verification notes in `docs/` and link them from this index.
+Keep executable policy in `config/`, reusable checks in `scripts/` or `tools/`,
+and fixtures in `tests/`. Preserve existing paths when organising documentation;
+update inbound links when a move is necessary. Never place raw payloads, provider
+credentials, generated history or private reports in documentation or fixtures.
 
 ## Reference patterns
 
-Use LLM Guard, Microsoft Presidio, NeMo Guardrails, OWASP AI Testing Guide,
-and FastAPI as comparison points. Preserve this repository's smaller,
-metadata-only, fail-closed baseline rather than implying feature parity.
+LLM Guard, Microsoft Presidio, NeMo Guardrails, OWASP AI Testing Guide and FastAPI
+are comparison references. They do not establish feature parity or add runtime
+dependencies to this repository.
 

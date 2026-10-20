@@ -7,6 +7,8 @@ cloud AI or language-model services.
 READ FIRST
 ----------
 
+Use docs/DOCUMENTATION_INDEX.md for task-based links and the repository map.
+
 1. README.md                 Overview, setup, and request flow
 2. docs/security.md          Threats, privacy boundaries, and limitations
 3. docs/architecture.md      Components and extension points
