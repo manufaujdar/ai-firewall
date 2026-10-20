@@ -109,6 +109,7 @@ assistive-technology, and security review are still required.
 
 ## Project documentation
 
+- [Documentation index and repository map](docs/DOCUMENTATION_INDEX.md)
 - [Architecture](docs/architecture.md)
 - [Security boundary](docs/security.md)
 - [Known limitations](docs/limitations.md)
